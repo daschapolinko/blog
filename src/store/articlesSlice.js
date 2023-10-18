@@ -41,7 +41,6 @@ export const createArticle = createAsyncThunk(
   'articles/createArticle',
   async (article, { getState, rejectWithValue }) => {
     const { token } = getState().user;
-    console.log(article);
     const createOptions = {
       method: 'POST',
       headers: { Authorization: `Token ${token}`, ...options.headers },
@@ -51,7 +50,6 @@ export const createArticle = createAsyncThunk(
       const response = await fetch(`${url}/articles`, createOptions);
       if (!response.ok && response.status !== 422) throw new Error(response.status);
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(error);
@@ -143,15 +141,13 @@ const articlesSlice = createSlice({
       .addMatcher(
         (action) => action.type.startsWith('articles') && action.type.endsWith('/fulfilled'),
         (state, action) => {
-          console.log(action);
           state.currentArticle = action.payload.article;
           state.status = 'resolved';
         }
       )
       .addMatcher(
         (action) => action.type.startsWith('articles') && action.type.endsWith('/pending'),
-        (state, action) => {
-          console.log(action);
+        (state) => {
           state.status = 'loading';
           state.error = null;
         }

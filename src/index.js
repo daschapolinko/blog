@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import ErrorPage from './ErrorPage';
+import NotFound from './NotFound';
 import App from './routes/App';
 import Article from './routes/Article';
 import List from './routes/List';
@@ -97,6 +98,10 @@ function Routers() {
         {
           path: '/profile',
           element: <Profile />,
+        },
+        {
+          path: '*',
+          element: <NotFound />,
         },
       ],
     },

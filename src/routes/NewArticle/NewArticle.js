@@ -40,7 +40,6 @@ export default function NewArticle() {
   const error = useSelector((state) => state.articles.error);
 
   const onSubmit = (data) => {
-    console.log(data);
     dispatch(
       createArticle(
         JSON.stringify({
@@ -59,8 +58,6 @@ export default function NewArticle() {
     if (error) setError('root.serverError', error);
     else navigate('/');
   };
-
-  console.log(fields);
 
   return (
     <Paper sx={{ px: 3, py: 2 }}>
