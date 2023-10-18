@@ -1,0 +1,84 @@
+{
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "jest": true
+    },
+    "ignorePatterns": ["node_modules", "dist", "build"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:prettier/recommended",
+      "plugin:import/errors",
+      "plugin:import/warnings",
+      "airbnb", "prettier", "prettier/prettier"
+    ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": "latest",
+    "requireConfigFile": false,
+    "sourceType": "module",
+    "babelOptions": {
+      "presets": ["@babel/preset-react"]
+   }
+    },
+    "plugins": ["babel", "react", "react-hooks", "prettier", "import", "jsx-a11y"],
+    "rules": {
+      "indent": ["error", 2, { "SwitchCase": 1 }],
+      "prettier/prettier": ["error", { "endOfLine": "auto" }],
+      "linebreak-style": [0, "unix"],
+      "quotes": ["error", "single"],
+      "semi": ["error", "always"],
+      "no-underscore-dangle": 0,
+      "react/state-in-constructor": 0,
+      "jsx-a11y/label-has-associated-control": 0,
+      "jsx-a11y/control-has-associated-label": 0,
+      "jsx-a11y/no-noninteractive-element-interactions": 0,
+      "jsx-a11y/click-events-have-key-events": 0,
+      "jsx-a11y/no-autofocus": 0,
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": 0,
+      "import/no-unresolved": [2, { "caseSensitive": false }],
+      "default-param-last": 0,
+      "react/jsx-props-no-spreading": 0,
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "import/extensions": [
+        "error",
+        "ignorePackages",
+        {
+          "js": "never",
+          "jsx": "never",
+          "ts": "never",
+          "tsx": "never"
+        }
+     ],
+      "import/order": [
+        2,
+        {
+          "groups": [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index"
+          ],
+          "newlines-between": "always"
+        }
+      ]
+    },
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [".js", ".jsx", ".ts", ".tsx"],
+          "moduleDirectory": ["node_modules", "src/"]
+        }
+      },
+      "react": {
+        "version": "detect"
+    }
+    }
+  }
