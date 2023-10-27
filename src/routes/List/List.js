@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 
-import { fetchArticles } from '../../store/articlesSlice';
+import { favoriteArticle, fetchArticles } from '../../store/articlesSlice';
 import LoadingPage from '../../LoadingPage';
 
 function List() {
@@ -40,6 +40,7 @@ function List() {
 }
 
 function ListItem({ article }) {
+  const dispatch = useDispatch();
   const { author, createdAt, description, favorited, favoritesCount, slug, tagList, title } = article;
   const tags = tagList.map((tag) => <Chip label={tag} key={tag} variant="outlined" />);
   return (
@@ -53,7 +54,13 @@ function ListItem({ article }) {
                   {title}
                 </Typography>
               </Link>
-              <IconButton aria-label="add to favorites" size="small">
+              <IconButton
+                aria-label="add to favorites"
+                size="small"
+                onClick={() => {
+                  dispatch(favoriteArticle(slug));
+                }}
+              >
                 {favorited ? <FavoriteRoundedIcon color="warning" /> : <FavoriteBorderRoundedIcon />}
                 {favoritesCount}
               </IconButton>

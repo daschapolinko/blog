@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider, useDispatch } from 'react-redux';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { createBrowserRouter, Navigate, redirect, RouterProvider } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -13,8 +13,7 @@ import List from './routes/List';
 import SignIn from './routes/SignIn';
 import SignUp from './routes/SignUp';
 import Profile from './routes/Profile';
-import NewArticle from './routes/NewArticle';
-import EditArticle from './routes/EditArticle';
+import ChangeArticle from './routes/ChangeArticle';
 import store, { persistor } from './store/store';
 import { fetchArticles, fetchArticle } from './store/articlesSlice';
 
@@ -58,6 +57,7 @@ function Routers() {
   useEffect(() => {
     dispatch(fetchArticles(1));
   });
+  const user = useSelector((state) => state.user.currentUser);
   const router = createBrowserRouter([
     {
       path: '/',
@@ -72,10 +72,15 @@ function Routers() {
         {
           path: '/articles',
           element: <List />,
+          loader: async () => dispatch(fetchArticles()),
         },
         {
           path: '/newArticle',
-          element: <NewArticle />,
+          element: (
+            <ProtectedRoute user={user}>
+              <ChangeArticle />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'articles/:slug',
@@ -84,20 +89,40 @@ function Routers() {
         },
         {
           path: 'articles/:slug/edit',
-          element: <EditArticle />,
-          loader: async ({ params }) => dispatch(fetchArticle(params.slug)),
+          element: (
+            <ProtectedRoute user={user}>
+              <ChangeArticle edit />
+            </ProtectedRoute>
+          ),
+          loader: async ({ params }) => {
+            const { article } = (await dispatch(fetchArticle(params.slug))).payload;
+            if (user && user.username !== article.author.username) return redirect('/');
+            return null;
+          },
         },
         {
           path: '/signIn',
-          element: <SignIn />,
+          element: (
+            <ProtectedRoute user={user} afterAuth>
+              <SignIn />
+            </ProtectedRoute>
+          ),
         },
         {
           path: '/signUp',
-          element: <SignUp />,
+          element: (
+            <ProtectedRoute user={user} afterAuth>
+              <SignUp />
+            </ProtectedRoute>
+          ),
         },
         {
           path: '/profile',
-          element: <Profile />,
+          element: (
+            <ProtectedRoute user={user}>
+              <Profile />
+            </ProtectedRoute>
+          ),
         },
         {
           path: '*',
@@ -121,3 +146,13 @@ root.render(
     </ThemeProvider>
   </React.StrictMode>
 );
+
+function ProtectedRoute({ user, afterAuth = false, redirectPath = '/', children }) {
+  if (!user) {
+    return <Navigate to={redirectPath} replace />;
+  }
+  if (user && afterAuth) {
+    return <Navigate to={redirectPath} replace />;
+  }
+  return children;
+}

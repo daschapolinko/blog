@@ -95,9 +95,9 @@ export const deleteArticle = createAsyncThunk('articles/deleteArticle', async (s
 
 export const favoriteArticle = createAsyncThunk(
   'articles/favoriteArticle',
-  async (slug, { getState, rejectWithValue }) => {
+  async (slug, { getState, dispatch, rejectWithValue }) => {
     const { token } = getState().user;
-    const { favorited } = getState().articles.currentArticle;
+    const { favorited } = (await dispatch(fetchArticle(slug))).payload.article;
     const method = favorited ? 'DELETE' : 'POST';
     const favOptions = {
       method,

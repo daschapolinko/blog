@@ -60,7 +60,7 @@ export default function Article() {
               </Stack>
               <Avatar alt={author.username} src={author.image} />
             </Stack>
-            {author.username === user.username && (
+            {user && author.username === user.username && (
               <Stack direction="row" justifyContent="space-evenly" spacing={1}>
                 <Button aria-describedby={id} variant="outlined" color="error" onClick={handleClick}>
                   Delete

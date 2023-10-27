@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -28,7 +28,6 @@ export default function SignIn() {
 
   const dispatch = useDispatch();
   const error = useSelector((state) => state.user.error);
-  const navigate = useNavigate();
 
   const statusUser = useSelector((state) => state.user.status);
   if (statusUser === 'loading') return <LoadingPage />;
@@ -36,7 +35,6 @@ export default function SignIn() {
   const onSubmit = (data) => {
     dispatch(loginUser(JSON.stringify({ user: { email: data.email, password: data.password } })));
     if (error) setError('root.serverError', error);
-    else navigate('/');
   };
 
   return (

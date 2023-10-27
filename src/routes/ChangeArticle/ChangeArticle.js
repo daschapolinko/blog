@@ -1,12 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Paper, Grid, Stack, TextField, Typography, Button } from '@mui/material';
 
-import { createArticle } from '../../store/articlesSlice';
+import { createArticle, updateArticle } from '../../store/articlesSlice';
+import LoadingPage from '../../LoadingPage';
 
 const validationSchema = Yup.object()
   .shape({
@@ -16,7 +17,17 @@ const validationSchema = Yup.object()
   })
   .required();
 
-export default function NewArticle() {
+export default function ChangeArticle({ edit }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const article = edit
+    ? useSelector((state) => state.articles.currentArticle) || useLoaderData().payload.article
+    : { title: '', description: '', body: '', tagList: [] };
+  const { body, description, tagList, title, slug } = article;
+  const error = useSelector((state) => state.articles.error);
+  const tags = tagList.map((element) => ({ value: element }));
+  tags.push({ value: '' });
+
   const {
     register,
     control,
@@ -26,43 +37,68 @@ export default function NewArticle() {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      tag: [{ value: '' }],
+      tag: tags,
     },
   });
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'tag',
   });
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const error = useSelector((state) => state.articles.error);
+  const send = useRef();
 
   const onSubmit = (data) => {
-    dispatch(
-      createArticle(
-        JSON.stringify({
-          article: {
-            title: data.title,
-            description: data.description,
-            body: data.text,
-            tagList: data.tag
-              .map((element) => element.value)
-              .filter((element) => typeof element !== 'undefined')
-              .filter((element) => element !== ''),
-          },
-        })
-      )
-    );
-    if (error) setError('root.serverError', error);
-    else navigate('/');
+    if (!send.current) {
+      send.current = true;
+      // eslint-disable-next-line no-return-assign
+      setTimeout(() => (send.current = false), 3000);
+      if (edit) {
+        dispatch(
+          updateArticle({
+            article: JSON.stringify({
+              article: {
+                title: data.title,
+                description: data.description,
+                body: data.text,
+                tagList: data.tag
+                  .map((element) => element.value)
+                  .filter((element) => typeof element !== 'undefined')
+                  .filter((element) => element !== ''),
+              },
+            }),
+            slug,
+          })
+        );
+        if (error) setError('root.serverError', error);
+        navigate('..', { relative: 'path' });
+      } else {
+        dispatch(
+          createArticle(
+            JSON.stringify({
+              article: {
+                title: data.title,
+                description: data.description,
+                body: data.text,
+                tagList: data.tag
+                  .map((element) => element.value)
+                  .filter((element) => typeof element !== 'undefined')
+                  .filter((element) => element !== ''),
+              },
+            })
+          )
+        );
+        if (error) setError('root.serverError', error);
+        else navigate('/');
+      }
+    }
   };
+
+  const statusArticle = useSelector((state) => state.articles.status);
+  if (statusArticle === 'loading') return <LoadingPage />;
 
   return (
     <Paper sx={{ px: 3, py: 2 }}>
       <Typography variant="h6" align="center" margin="dense">
-        Create new article
+        {edit ? 'Edit article' : 'Create new article'}
       </Typography>
       <Grid container spacing={1}>
         <Grid item xs={12}>
@@ -74,6 +110,7 @@ export default function NewArticle() {
             name="title"
             label="Title"
             autoComplete="title"
+            defaultValue={title}
             fullWidth
             margin="dense"
             {...register('title')}
@@ -91,6 +128,7 @@ export default function NewArticle() {
             name="description"
             label="Short description"
             fullWidth
+            defaultValue={description}
             color="secondary"
             margin="dense"
             {...register('description')}
@@ -108,6 +146,7 @@ export default function NewArticle() {
             name="text"
             label="Text"
             fullWidth
+            defaultValue={body}
             multiline
             rows={4}
             color="secondary"
