@@ -39,8 +39,13 @@ export default function Article() {
               <Typography variant="h5" component="div" color="secondary">
                 {title}
               </Typography>
-              <IconButton aria-label="add to favorites" size="small" onClick={() => dispatch(favoriteArticle(slug))}>
-                {favorited ? <FavoriteRoundedIcon color="warning" /> : <FavoriteBorderRoundedIcon />}
+              <IconButton
+                aria-label="add to favorites"
+                size="small"
+                onClick={() => dispatch(favoriteArticle(slug))}
+                disabled={!user}
+              >
+                {favorited ? <FavoriteRoundedIcon color="error" /> : <FavoriteBorderRoundedIcon />}
                 {favoritesCount}
               </IconButton>
             </Stack>

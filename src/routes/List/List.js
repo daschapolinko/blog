@@ -41,6 +41,7 @@ function List() {
 
 function ListItem({ article }) {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.currentUser);
   const { author, createdAt, description, favorited, favoritesCount, slug, tagList, title } = article;
   const tags = tagList.map((tag) => <Chip label={tag} key={tag} variant="outlined" />);
   return (
@@ -60,6 +61,7 @@ function ListItem({ article }) {
                 onClick={() => {
                   dispatch(favoriteArticle(slug));
                 }}
+                disabled={!user}
               >
                 {favorited ? <FavoriteRoundedIcon color="warning" /> : <FavoriteBorderRoundedIcon />}
                 {favoritesCount}
