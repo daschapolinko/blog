@@ -148,7 +148,7 @@ root.render(
 );
 
 function ProtectedRoute({ user, afterAuth = false, redirectPath = '/', children }) {
-  if (!user) {
+  if (!user && !afterAuth) {
     return <Navigate to={redirectPath} replace />;
   }
   if (user && afterAuth) {
